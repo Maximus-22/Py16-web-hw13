@@ -108,7 +108,7 @@ async def confirmed_email(token: str, request: Request, db: AsyncSession = Depen
     # return {"message": "Email confirmed"}
     try:
         # Так й не змiг перебороти, щоб в шаблонi [confirmed_email.html] коректно вiдображався {{ user.username }}
-        # хоча вивод цього параметру перед передачею шаблону говорить, що все гаразд... 
+        # хоча вивiд цього параметру перед передачею його до шаблону говорить, що все гаразд... 
         return templates.TemplateResponse("confirmed_email.html", {"request": request, "user": user})
     except Exception as err:
         print(f"Error rendering template: {err}")

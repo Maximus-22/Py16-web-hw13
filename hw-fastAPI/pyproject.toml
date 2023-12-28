@@ -20,6 +20,9 @@ asyncpg = "^0.29.0"
 pydantic = {extras = ["email"], version = "^2.5.2"}
 libgravatar = "^1.0.4"
 fastapi-mail = "^1.4.1"
+python-dotenv = "^1.0.0"
+fastapi-limiter = "^0.1.5"
+cloudinary = "^1.37.0"
 
 
 [build-system]

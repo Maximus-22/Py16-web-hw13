@@ -1,24 +1,34 @@
-from pydantic import BaseSettings
+from typing import Any
+
+from pydantic import ConfigDict, field_validator, EmailStr
+from pydantic_settings import BaseSettings
 
 
 class Settings(BaseSettings):
-    sqlalchemy_database_url: str
-    secret_key: str
-    algorithm: str
-    mail_username: str
-    mail_password: str
-    mail_from: str
-    mail_port: int
-    mail_server: str
-    redis_host: str = 'localhost'
-    redis_port: int = 6379
-    cloudinary_name: str
-    cloudinary_api_key: str
-    cloudinary_api_secret: str
+    DB_URL: str = "postgresql+asyncpg://postgres:111111@localhost:5432/abc"
+    SECRET_KEY_JWT: str = "1234567890"
+    ALGORITHM: str = "HS256"
+    MAIL_USERNAME: EmailStr = "postgres@meail.com"
+    MAIL_PASSWORD: str = "postgres"
+    MAIL_FROM: str = "postgres"
+    MAIL_PORT: int = 567234
+    MAIL_SERVER: str = "postgres"
+    REDIS_DOMAIN: str = 'localhost'
+    REDIS_PORT: int = 6379
+    REDIS_PASSWORD: str | None = None
+    CLD_NAME: str = 'abc'
+    CLD_API_KEY: int = 326488457974591
+    CLD_API_SECRET: str = "secret"
 
-    class Config:
-        env_file = ".env"
-        env_file_encoding = "utf-8"
+    @field_validator("ALGORITHM")
+    @classmethod
+    def validate_algorithm(cls, v: Any):
+        if v not in ["HS256", "HS512"]:
+            raise ValueError("algorithm must be HS256 or HS512")
+        return v
 
 
-settings = Settings()
+    model_config = ConfigDict(extra='ignore', env_file=".env", env_file_encoding="utf-8")  # noqa
+
+
+config = Settings()

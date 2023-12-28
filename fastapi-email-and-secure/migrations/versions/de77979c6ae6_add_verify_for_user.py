@@ -1,19 +1,21 @@
-"""verification email
+"""add verify for user
 
-Revision ID: 3fe823ab9309
-Revises: 7b204d9cccf1
-Create Date: 2023-02-09 13:08:31.277099
+Revision ID: de77979c6ae6
+Revises: 787e4ad07d8a
+Create Date: 2023-12-18 19:40:09.477291
 
 """
+from typing import Sequence, Union
+
 from alembic import op
 import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '3fe823ab9309'
-down_revision = '7b204d9cccf1'
-branch_labels = None
-depends_on = None
+revision: str = 'de77979c6ae6'
+down_revision: Union[str, None] = '787e4ad07d8a'
+branch_labels: Union[str, Sequence[str], None] = None
+depends_on: Union[str, Sequence[str], None] = None
 
 
 def upgrade() -> None:

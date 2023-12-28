@@ -5,20 +5,20 @@ from fastapi_mail.errors import ConnectionErrors
 from pydantic import EmailStr
 
 from src.services.auth import auth_service
+from src.conf.config import config
 
 conf = ConnectionConfig(
-    MAIL_USERNAME="app.systems@rusanovka-net.kiev.ua",
-    MAIL_PASSWORD="123Qwe",
-    MAIL_FROM="app.systems@rusanovka-net.kiev.ua",
-    MAIL_PORT=25,
-    MAIL_SERVER="mail.rusanovka-net.kiev.ua",
+    MAIL_USERNAME=config.MAIL_USERNAME,
+    MAIL_PASSWORD=config.MAIL_PASSWORD,
+    MAIL_FROM=config.MAIL_USERNAME,
+    MAIL_PORT=config.MAIL_PORT,
+    MAIL_SERVER=config.MAIL_SERVER,
     MAIL_FROM_NAME="Global BASE of Contacts",
     MAIL_STARTTLS=True,
     MAIL_SSL_TLS=False,
     USE_CREDENTIALS=True,
     VALIDATE_CERTS=False,
-    TEMPLATE_FOLDER=Path(__file__).parent / 'templates',
-)
+    TEMPLATE_FOLDER=Path(__file__).parent / 'templates',)
 
 
 async def send_email(email: EmailStr, username: str, host: str):
@@ -28,8 +28,7 @@ async def send_email(email: EmailStr, username: str, host: str):
             subject="Confirm your email, please",
             recipients=[email],
             template_body={"host": host, "username": username, "token": token_verification},
-            subtype=MessageType.html
-        )
+            subtype=MessageType.html)
 
         fast_m = FastMail(conf)
         await fast_m.send_message(message, template_name="verify_email.html")

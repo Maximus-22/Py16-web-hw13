@@ -1,41 +1,49 @@
+from fastapi import Depends
+from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
 from libgravatar import Gravatar
-from sqlalchemy.orm import Session
 
-from src.database.models import User
-from src.schemas import UserModel
-
-
-async def get_user_by_email(email: str, db: Session) -> User:
-    return db.query(User).filter(User.email == email).first()
+from src.database.db import get_db
+from src.entity.models import User
+from src.schemas.user import UserSchema
 
 
-async def create_user(body: UserModel, db: Session) -> User:
+async def get_user_by_email(email: str, db: AsyncSession = Depends(get_db)):
+    stmt = select(User).filter_by(email=email)
+    user = await db.execute(stmt)
+    user = user.scalar_one_or_none()
+    return user
+
+
+async def create_user(body: UserSchema, db: AsyncSession = Depends(get_db)):
     avatar = None
     try:
         g = Gravatar(body.email)
         avatar = g.get_image()
-    except Exception as e:
-        print(e)
-    new_user = User(**body.dict(), avatar=avatar)
+    except Exception as err:
+        print(err)
+
+    new_user = User(**body.model_dump(), avatar=avatar)
     db.add(new_user)
-    db.commit()
-    db.refresh(new_user)
+    await db.commit()
+    await db.refresh(new_user)
     return new_user
 
 
-async def update_token(user: User, token: str | None, db: Session) -> None:
+async def update_token(user: User, token: str | None, db: AsyncSession):
     user.refresh_token = token
-    db.commit()
+    await db.commit()
 
 
-async def confirmed_email(email: str, db: Session) -> None:
+async def confirmed_email(email: str, db: AsyncSession) -> None:
     user = await get_user_by_email(email, db)
     user.confirmed = True
-    db.commit()
+    await db.commit()
 
 
-async def update_avatar(email, url: str, db: Session) -> User:
+async def update_avatar_url(email: str, url: str | None, db: AsyncSession) -> User:
     user = await get_user_by_email(email, db)
     user.avatar = url
-    db.commit()
+    await db.commit()
+    await db.refresh(user)
     return user
