@@ -47,5 +47,18 @@ async def confirmed_email(email: str, db: AsyncSession) -> None:
     if user is not None:
         user.confirmed = True
         await db.commit()
+        await db.refresh(user)
     else:
         raise ValueError("User not found for email: {}".format(email))
+    
+
+# чому тут на прийом не <user>: [User], а <email>: str
+# оскiльки ми зiбралися кешувати <user>, то попередня сесiя до БД збереглася як об'єкт [user] з
+# певними параметрами, а зараз при iнiцiюваннi нових змiн вже потрiбна iнша сесiя до БД, тому
+# як якорь беремо незмiнний парамерт <email>  
+async def update_avatar_url(email: str, url: str | None, db: AsyncSession) -> User:
+    user = await get_user_by_email(email, db)
+    user.avatar = url
+    await db.commit()
+    await db.refresh(user)
+    return user

@@ -1,5 +1,5 @@
 import re
-import redis.asyncio as redis
+import redis.asyncio as aioredis
 from ipaddress import ip_address, ip_network
 from typing import Callable
 
@@ -12,7 +12,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 
 from src.database.db import get_db
-from src.routes import auth, birthday_contacts, contacts, search_contacts
+from src.routes import auth, birthday_contacts, contacts, search_contacts, users
 from src.conf.config import config
 
 # Запуск проекту:
@@ -83,12 +83,13 @@ app.include_router(auth.router, prefix="/api")
 app.include_router(contacts.router, prefix="/api")
 app.include_router(search_contacts.router, prefix='/api')
 app.include_router(birthday_contacts.router, prefix='/api')
+app.include_router(users.router, prefix="/api")
 
 
 # Ratelimit iнiцiюється тут з тегом "startup", а потiм ще додається його реалiзацiя у src/routes
 @app.on_event("startup")
 async def startup():
-    redis_memory = await redis.Redis(
+    redis_memory = await aioredis.Redis(
         host=config.REDIS_DOMAIN,
         port=config.REDIS_PORT,
         db=0,
